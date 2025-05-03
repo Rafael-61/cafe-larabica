@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registro de Pedidos - Café La Arábica</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f1ee;
+      padding: 2rem;
+      color: #3e3e3e;
+    }
+    h1 {
+      color: #6b3e26;
+      text-align: center;
+    }
+    form {
+      max-width: 500px;
+      margin: auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-top: 1rem;
+    }
+    input {
+      width: 100%;
+      padding: 0.6rem;
+      margin-top: 0.3rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    button {
+      margin-top: 1.5rem;
+      background: #6b3e26;
+      color: white;
+      padding: 0.7rem;
+      width: 100%;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    button:hover {
+      background: #8b5637;
+    }
+    .success {
+      text-align: center;
+      color: green;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Registrar Pedido - Café La Arábica</h1>
+  <form id="pedidoForm">
+    <label for="nombre">Nombre:</label>
+    <input type="text" id="nombre" required />
+
+    <label for="correo">Correo electrónico:</label>
+    <input type="email" id="correo" required />
+
+    <label for="telefono">Teléfono:</label>
+    <input type="tel" id="telefono" required />
+
+    <label for="fecha">Fecha del pedido:</label>
+    <input type="date" id="fecha" required />
+
+    <button type="submit">Enviar Pedido</button>
+    <div class="success" id="mensajeExito" style="display: none;">¡Pedido registrado con éxito!</div>
+  </form>
+
+  <!-- Firebase SDKs y lógica del formulario -->
+  <script type="module">
+    // Importar funciones necesarias desde Firebase CDN
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // Configuración Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyCfxJmCZhKX-Vh3B8RlIJaJrviHyTMGP0A",
+      authDomain: "cafe-larabica.firebaseapp.com",
+      projectId: "cafe-larabica",
+      storageBucket: "cafe-larabica.firebasestorage.app",
+      messagingSenderId: "998094820457",
+      appId: "1:998094820457:web:82fcd2b8878f0c73cabef8",
+      measurementId: "G-BBKMVTBHND"
+    };
+
+    // Inicializar Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const db = getFirestore(app);
+
+    // Referencia al formulario
+    const form = document.getElementById('pedidoForm');
+    const mensajeExito = document.getElementById('mensajeExito');
+
+    // Envío del formulario
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const nombre = document.getElementById('nombre').value.trim();
+      const correo = document.getElementById('correo').value.trim();
+      const telefono = document.getElementById('telefono').value.trim();
+      const fecha = document.getElementById('fecha').value;
+
+      try {
+        await addDoc(collection(db, "pedidos"), {
+          nombre,
+          correo,
+          telefono,
+          fecha
+        });
+
+        form.reset();
+        mensajeExito.style.display = 'block';
+        setTimeout(() => mensajeExito.style.display = 'none', 4000);
+      } catch (error) {
+        alert("Error al registrar el pedido: " + error.message);
+      }
+    });
+  </script>
+</body>
+</html>
